@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ada Clicker Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        #game-container {
+            text-align: center;
+        }
+        #click-button {
+            font-size: 1.5em;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+        #counter {
+            font-size: 2em;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <h1>Ada Clicker</h1>
+        <div id="counter">0</div>
+        <button id="click-button">Click me!</button>
+    </div>
+
+    <script>
+        let count = 0;
+        const counterDisplay = document.getElementById('counter');
+        const clickButton = document.getElementById('click-button');
+
+        // Load saved state
+        function loadGame() {
+            const savedCount = localStorage.getItem('adaClickerCount');
+            if (savedCount !== null) {
+                count = parseInt(savedCount);
+                updateDisplay();
+            }
+        }
+
+        // Save state
+        function saveGame() {
+            localStorage.setItem('adaClickerCount', count.toString());
+        }
+
+        // Update display
+        function updateDisplay() {
+            counterDisplay.textContent = count;
+        }
+
+        // Click handler
+        clickButton.addEventListener('click', () => {
+            count++;
+            updateDisplay();
+            saveGame();
+        });
+
+        // Initialize game
+        loadGame();
+
+        // Auto-save every 10 seconds
+        setInterval(saveGame, 10000);
+    </script>
+</body>
+</html>
