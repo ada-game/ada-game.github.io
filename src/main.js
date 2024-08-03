@@ -1,19 +1,8 @@
 import { initGame, handleKeypress, buyCore, cpuAutoType, resetGame, addArbitraryFlops, addArbitraryCPUCores } from './game.js';
-import { devMode, cpuUpdateSpeed } from './constants.js';
+import { cpuUpdateSpeed } from './constants.js';
 import { saveGame, loadGame } from './storage.js';
 
-const resetButton = document.getElementById('reset-button');
-const buyCpuCoreButton = document.getElementById('buy-cpu-core');
-
-// Dev mode elements
-const devSidebar = document.getElementById('dev-sidebar');
-const addOneCPUCoreButton = document.getElementById('add-one-cpu');
-const addCpuCoreButton = document.getElementById('add-cpu');
-const addCpuCoreField = document.getElementById('add-cpu-input');
-const addFlopsButton = document.getElementById('add-flops');
-const addFlopsField = document.getElementById('add-flops-input');
-
-devSidebar.style.display = devMode ? 'block' : 'none';
+import { resetButton, buyCpuCoreButton, addOneCPUCoreButton, addCpuCoreButton, addCpuCoreField, addFlopsButton, addFlopsField } from './ui.js';
 
 // Initial setup
 initGame();
@@ -27,13 +16,12 @@ buyCpuCoreButton.addEventListener('click', buyCore);
 resetButton.addEventListener('click', resetGame);
 addOneCPUCoreButton.addEventListener('click', () => addArbitraryCPUCores(1));
 addCpuCoreButton.addEventListener('click', () => {
-    let amount = parseInt(addCpuCoreField.value);
-    if (isNaN(amount)) {
-        amount = 0;
+        let amount = parseInt(addCpuCoreField.value);
+        if (isNaN(amount)) {
+            amount = 0;
+        }
+        addArbitraryCPUCores(amount);
     }
-    addArbitraryCPUCores(amount);
-}
-
 );
 addFlopsButton.addEventListener('click', () => {
     let amount = parseInt(addFlopsField.value);

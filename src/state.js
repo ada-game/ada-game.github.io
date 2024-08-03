@@ -1,17 +1,16 @@
 import { playerOriginalText, cpuOriginalText } from './constants.js';
 import { TypingEntity } from './typing.js';
+import { resetVisibility, updateVisibility } from './ui.js';
 
 class GameState {
     constructor(playerTypingEntity, 
                 cpuTypingEntity,
-                cpuTypingArea,
                 flopsDisplay, 
                 cpuCoresDisplay, 
                 flops=0, 
                 cpuCores=0) {
         this.playerTypingEntity = playerTypingEntity;
         this.cpuTypingEntity = cpuTypingEntity;
-        this.cpuTypingArea = cpuTypingArea;
         this.flopsDisplay = flopsDisplay;
         this.cpuCoresDisplay = cpuCoresDisplay;
         this.flops = flops;
@@ -21,16 +20,13 @@ class GameState {
     updateFlops(amount=0) {
         this.flops += amount;
         this.flopsDisplay.textContent = `FLOPS: ${Math.floor(this.flops)}`;
+        updateVisibility(this);
     }
 
     updateCpuCores(amount=0) {
         this.cpuCores += amount;
         this.cpuCoresDisplay.textContent = `CPU Cores: ${this.cpuCores}`;
-        if (this.cpuCores > 0) {
-            this.cpuTypingArea.style.display = 'block';
-        } else {
-            this.cpuTypingArea.style.display = 'none';
-        }
+        updateVisibility(this);
     }
 
     buyCore(debug=false) {
@@ -50,6 +46,7 @@ class GameState {
         this.updateCpuCores();
         this.playerTypingEntity.reset();
         this.cpuTypingEntity.reset();
+        resetVisibility();
     }
 }
 
@@ -64,12 +61,9 @@ let cpuTypingEntity = new TypingEntity(cpuOriginalText, cpuTypedText, cpuUntyped
 let flopsDisplay = document.getElementById('flops');
 let cpuCoresDisplay = document.getElementById('cpu-cores');
 
-const cpuTypingArea = document.getElementById('cpu-typing-area');
-
 export let gameState = new GameState(
     playerTypingEntity, 
     cpuTypingEntity, 
-    cpuTypingArea, 
     flopsDisplay, 
     cpuCoresDisplay
 );

@@ -1,12 +1,11 @@
 
 import { gameState } from './state.js';
 import { cpuUpdateSpeed } from './constants.js';
+import { toggleFade } from './ui.js';
 
 export function initGame() {
-    gameState.updateFlops();
-    gameState.updateCpuCores();
-    gameState.playerTypingEntity.reset();
-    gameState.cpuTypingEntity.reset();
+    toggleFade('player-typing-area');
+    gameState.reset();
 }
 
 export function handleKeypress(event) {

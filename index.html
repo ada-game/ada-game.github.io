@@ -9,21 +9,28 @@
 <body>
     <div id="game-container">
         <h1>Hello World</h1>
-        <div id="player-typing-area" class="typing-area">
+        <div id="player-typing-area" class="typing-area fade-element">
             <div class="typed-text"></div>
             <div class="cursor"></div>
             <div class="untyped-text"></div>
         </div>
-        <div id="cpu-typing-area" class="typing-area">
+        <div id="cpu-typing-area" class="typing-area fade-element">
             <div class="typed-text"></div>
             <div class="cursor"></div>
             <div class="untyped-text"></div>
         </div>
-        <div id="flops">FLOPS: 0</div>
-        <div id="cpu-cores">CPU Cores: 0</div>
-        <div id="shop">
+        <div id="gpu-typing-area" class="typing-area fade-element">
+            <div class="typed-text"></div>
+            <div class="cursor"></div>
+            <div class="untyped-text"></div>
+        </div>
+        <div id="flops" class="fade-element">FLOPS: 0</div>
+        <div id="cpu-cores" class="fade-element">CPU Cores: 0</div>
+        <div id="gpu-cores" class="fade-element">GPU Cores: 0</div>
+        <div id="shop" class="fade-element">
             <h2>Add Resources</h2>
             <button id="buy-cpu-core" class="modern-button">CPU Core (100 FLOPS)</button>
+            <button id="buy-gpu-core" class="modern-button fade-element">GPU Core (1000 FLOPS)</button>
         </div>
     </div>
 
@@ -34,11 +41,11 @@
         </div>
         <div><button id="add-one-cpu" class="modern-button">Add CPU Core</button></div>
         <div id="cpu-core-dev">
-            <input type="number" id="add-cpu-input" min="0" value="0">
+            <input type="number" id="add-cpu-input" min="0" value="1">
             <button id="add-cpu" class="modern-button">Add CPU Cores</button>
         </div>
         <div id="flops-input-dev">
-            <input type="number" id="add-flops-input" min="0" value="0">
+            <input type="number" id="add-flops-input" min="0" value="100">
             <button id="add-flops" class="modern-button">Add FLOPS</button>
         </div>
     </div>
