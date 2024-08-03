@@ -12,12 +12,12 @@
             align-items: center;
             height: 100vh;
             margin: 0;
-            background-color: #f0f0f0;
+            background-color: #F5E6D3; /* Soft beige color */
         }
         #game-container {
             text-align: center;
         }
-        #typing-area {
+        .typing-area {
             font-family: Arial, sans-serif;
             font-size: 2em;
             margin: 20px 0;
@@ -28,22 +28,22 @@
             width: 52ch;
             height: 1.2em;
         }
-        #typed-text, #untyped-text {
+        .typed-text, .untyped-text {
             position: absolute;
             width: 27ch; /* One larger to fix a spacing issue */
             overflow: hidden;
         }
-        #typed-text {
+        .typed-text {
             right: 26ch;
             text-align: right;
             color: #000;
         }
-        #untyped-text {
+        .untyped-text {
             left: 26ch;
             text-align: left;
-            color: #ccc;
+            color: rgba(0, 0, 0, 0.4);
         }
-        #cursor {
+        .cursor {
             display: inline-block;
             width: 0;
             height: 1.2em;
@@ -52,6 +52,23 @@
             position: absolute;
             bottom: 0;
             left: 26ch;
+        }
+        .modern-button {
+            background-color: #000000;
+            color: #F5E6D3;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+        .modern-button:hover {
+            background-color: #333333;
+            transform: scale(1.05);
+        }
+        .modern-button:active {
+            transform: scale(0.95);
         }
         @keyframes blink {
             50% { opacity: 0; }
@@ -73,58 +90,84 @@
             height: 100vh;
             overflow-y: auto;
         }
+        #cpu-typing-area {
+            display: none;
+        }
     </style>
 </head>
 <body>
     <div id="game-container">
         <h1>Ada Typing Game</h1>
-        <div id="typing-area">
-            <div id="typed-text"></div>
-            <div id="cursor"></div>
-            <div id="untyped-text"></div>
+        <div id="player-typing-area" class="typing-area">
+            <div class="typed-text"></div>
+            <div class="cursor"></div>
+            <div class="untyped-text"></div>
+        </div>
+        <div id="cpu-typing-area" class="typing-area">
+            <div class="typed-text"></div>
+            <div class="cursor"></div>
+            <div class="untyped-text"></div>
         </div>
         <div id="flops">FLOPS: 0</div>
         <div id="cpu-cores">CPU Cores: 0</div>
         <div id="shop">
             <h2>Shop</h2>
-            <button id="buy-cpu-core">Buy CPU Core (100 FLOPS)</button>
+            <button id="buy-cpu-core" class="modern-button">Buy CPU Core (100 FLOPS)</button>
         </div>
     </div>
 
     <div id="dev-sidebar">
         <h2>Developer Tools</h2>
-        <button id="reset-button">Reset Game</button>
+        <button id="reset-button" class="modern-button">Reset Game</button>
     </div>
 
     <script>
-        const originalText = "Ut enim ad minim veniam, ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate. ";
-        let text = originalText + originalText.substring(0, 26);
-        let typedIndex = 0;
+        const windowSize = 26;
+        const cpuUpdateSpeed = 10; // in ms
+        const playerOriginalText = "Ut enim ad minim veniam, ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate. ";
+        const cpuOriginalText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ";
+        let playerText = playerOriginalText + playerOriginalText.substring(0, windowSize);
+        let cpuText = cpuOriginalText + cpuOriginalText.substring(0, windowSize);
+        let playerTypedIndex = 0;
+        let cpuTypedIndex = 0;
         let flops = 0;
         let cpuCores = 0;
-        let typedText = document.getElementById('typed-text');
-        let untypedText = document.getElementById('untyped-text');
+        let playerTypedText = document.querySelector('#player-typing-area .typed-text');
+        let playerUntypedText = document.querySelector('#player-typing-area .untyped-text');
+        let cpuTypedText = document.querySelector('#cpu-typing-area .typed-text');
+        let cpuUntypedText = document.querySelector('#cpu-typing-area .untyped-text');
         let flopsDisplay = document.getElementById('flops');
         let cpuCoresDisplay = document.getElementById('cpu-cores');
         const resetButton = document.getElementById('reset-button');
         const buyCpuCoreButton = document.getElementById('buy-cpu-core');
         const devSidebar = document.getElementById('dev-sidebar');
-        const windowSize = 26;
+        const cpuTypingArea = document.getElementById('cpu-typing-area');
 
         function initGame() {
-            typedIndex = 0;
+            playerTypedIndex = 0;
+            cpuTypedIndex = 0;
             flops = 0;
             cpuCores = 0;
-            text = originalText + originalText.substring(0, 26);
+            playerText = playerOriginalText + playerOriginalText.substring(0, windowSize);
+            cpuText = cpuOriginalText + cpuOriginalText.substring(0, windowSize);
             updateFlops();
             updateCpuCores();
             renderGame();
         }
 
         function renderGame() {
-            if (typedIndex >= text.length - 26) {
-                text = originalText.substring(originalText.length - 26) + originalText + originalText.substring(0, 26);
-                typedIndex = 26;
+            let playerResult = renderTypingArea(playerText, playerTypedIndex, playerTypedText, playerUntypedText, playerOriginalText);
+            let cpuResult = renderTypingArea(cpuText, cpuTypedIndex, cpuTypedText, cpuUntypedText, cpuOriginalText);
+            playerText = playerResult.text;
+            playerTypedIndex = playerResult.typedIndex;
+            cpuText = cpuResult.text;
+            cpuTypedIndex = cpuResult.typedIndex;
+        }
+
+        function renderTypingArea(text, typedIndex, typedTextElement, untypedTextElement, originalText) {
+            if (typedIndex >= text.length - windowSize) {
+                text = originalText.substring(originalText.length - windowSize) + originalText + originalText.substring(0, windowSize);
+                typedIndex = windowSize;
             }
             
             let startIndex = typedIndex;
@@ -149,8 +192,10 @@
             untypedPortion = untypedPortion.slice(0, windowSize);
             
             // Apply fading effect and update the DOM
-            typedText.innerHTML = applyFadingEffect(typedPortion, true);
-            untypedText.innerHTML = applyFadingEffect(untypedPortion, false);
+            typedTextElement.innerHTML = applyFadingEffect(typedPortion, true);
+            untypedTextElement.innerHTML = applyFadingEffect(untypedPortion, false);
+
+            return { text, typedIndex };
         }
 
         function applyFadingEffect(str, isTyped) {
@@ -173,21 +218,32 @@
         }
 
         function updateFlops() {
-            flopsDisplay.textContent = `FLOPS: ${flops}`;
+            flopsDisplay.textContent = `FLOPS: ${Math.floor(flops)}`;
             saveGame();
         }
 
         function updateCpuCores() {
             cpuCoresDisplay.textContent = `CPU Cores: ${cpuCores}`;
             saveGame();
+            if (cpuCores > 0) {
+                cpuTypingArea.style.display = 'block';
+            }
         }
 
         function handleKeypress(event) {
-            if (event.key === text[typedIndex % text.length]) {
-                typedIndex++;
+            if (event.key === playerText[playerTypedIndex % playerText.length]) {
+                playerTypedIndex++;
                 flops++;
                 updateFlops();
-                renderGame();
+                let playerResult = renderTypingArea(playerText, playerTypedIndex, playerTypedText, playerUntypedText, playerOriginalText);
+                playerText = playerResult.text;
+                playerTypedIndex = playerResult.typedIndex;
+            }
+        }
+
+        function removeFocus() {
+            if (document.activeElement) {
+                document.activeElement.blur();
             }
         }
 
@@ -197,31 +253,48 @@
                 cpuCores++;
                 updateFlops();
                 updateCpuCores();
+                removeFocus();
             }
         }
 
         function resetGame() {
             initGame();
             saveGame();
+            removeFocus();
         }
 
         function saveGame() {
             localStorage.setItem('adaTypingFlops', flops.toString());
-            localStorage.setItem('adaTypingIndex', typedIndex.toString());
+            localStorage.setItem('adaTypingPlayerIndex', playerTypedIndex.toString());
+            localStorage.setItem('adaTypingCpuIndex', cpuTypedIndex.toString());
             localStorage.setItem('adaTypingCpuCores', cpuCores.toString());
         }
 
         function loadGame() {
             const savedFlops = localStorage.getItem('adaTypingFlops');
-            const savedIndex = localStorage.getItem('adaTypingIndex');
+            const savedPlayerIndex = localStorage.getItem('adaTypingPlayerIndex');
+            const savedCpuIndex = localStorage.getItem('adaTypingCpuIndex');
             const savedCpuCores = localStorage.getItem('adaTypingCpuCores');
-            if (savedFlops !== null && savedIndex !== null && savedCpuCores !== null) {
-                flops = parseInt(savedFlops);
-                typedIndex = parseInt(savedIndex);
+            if (savedFlops !== null && savedPlayerIndex !== null && savedCpuIndex !== null && savedCpuCores !== null) {
+                flops = parseFloat(savedFlops);
+                playerTypedIndex = parseInt(savedPlayerIndex);
+                cpuTypedIndex = parseInt(savedCpuIndex);
                 cpuCores = parseInt(savedCpuCores);
                 updateFlops();
                 updateCpuCores();
                 renderGame();
+            }
+        }
+
+        function cpuAutoType() {
+            if (cpuCores > 0) {
+                const autoTypeSpeed = Math.sqrt(cpuCores) * cpuUpdateSpeed / 1000;
+                cpuTypedIndex += autoTypeSpeed;
+                flops += autoTypeSpeed;
+                updateFlops();
+                let cpuResult = renderTypingArea(cpuText, cpuTypedIndex, cpuTypedText, cpuUntypedText, cpuOriginalText);
+                cpuText = cpuResult.text;
+                cpuTypedIndex = cpuResult.typedIndex;
             }
         }
 
@@ -236,6 +309,9 @@
         document.addEventListener('keypress', handleKeypress);
         resetButton.addEventListener('click', resetGame);
         buyCpuCoreButton.addEventListener('click', buyCore);
+
+        // Start CPU auto-typing
+        setInterval(cpuAutoType, cpuUpdateSpeed);
     </script>
 </body>
 </html>
