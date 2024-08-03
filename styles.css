@@ -1,0 +1,88 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #F5E6D3; /* Soft beige color */
+}
+#game-container {
+    text-align: center;
+}
+.typing-area {
+    font-family: Arial, sans-serif;
+    font-size: 2em;
+    margin: 20px 0;
+    letter-spacing: 2px;
+    position: relative;
+    white-space: nowrap;
+    overflow: hidden;
+    width: 52ch;
+    height: 1.2em;
+}
+.typed-text, .untyped-text {
+    position: absolute;
+    width: 27ch; /* One larger to fix a spacing issue */
+    overflow: hidden;
+}
+.typed-text {
+    right: 26ch;
+    text-align: right;
+    color: #000;
+}
+.untyped-text {
+    left: 26ch;
+    text-align: left;
+    color: rgba(0, 0, 0, 0.4);
+}
+.cursor {
+    display: inline-block;
+    width: 0;
+    height: 1.2em;
+    border-left: 2px solid #000;
+    animation: blink 0.7s infinite;
+    position: absolute;
+    bottom: 0;
+    left: 26ch;
+}
+.modern-button {
+    background-color: #000000;
+    color: #F5E6D3;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.modern-button:hover {
+    background-color: #444444;
+    /* transform: scale(1.05); */
+}
+.modern-button:active {
+    transform: scale(0.95);
+}
+@keyframes blink {
+    50% { opacity: 0; }
+}
+#flops, #cpu-cores {
+    font-size: 1.5em;
+    margin: 20px 0;
+}
+#shop {
+    margin-top: 20px;
+}
+#dev-sidebar {
+    position: fixed;
+    right: 0;
+    top: 0;
+    background-color: #ddd;
+    padding: 10px;
+    border-left: 1px solid #999;
+    height: 100vh;
+    overflow-y: auto;
+}
+#cpu-typing-area {
+    display: none;
+}
