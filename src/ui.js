@@ -1,11 +1,8 @@
-import { devMode } from "./constants.js";
+import { cpuCost, devMode, gpuCost } from "./constants.js";
 
 export const resetButton = document.getElementById('reset-button');
 export const buyCpuCoreButton = document.getElementById('buy-cpu-core');
-const shopArea = document.getElementById('shop');
-const cpuTypingArea = document.getElementById('cpu-typing-area');
-const flopsDisplay = document.getElementById('flops');
-const cpuCoresDisplay = document.getElementById('cpu-cores');
+export const buyGpuCoreButton = document.getElementById('buy-gpu-core');
 
 // Dev mode elements
 const devSidebar = document.getElementById('dev-sidebar');
@@ -18,26 +15,37 @@ export const addFlopsField = document.getElementById('add-flops-input');
 devSidebar.style.display = devMode ? 'block' : 'none';
 
 export function resetVisibility() {
+    toggleFade('cpu-typing-area', false);
+    toggleFade('gpu-typing-area', false);
+    
     toggleFade('flops', false);
     toggleFade('cpu-cores', false);
+    toggleFade('gpu-cores', false);
+
     toggleFade('shop', false);
-    toggleFade('cpu-typing-area', false);
     toggleFade('buy-cpu-core', false);
+    toggleFade('buy-gpu-core', false);
 }
 
 export function updateVisibility(gameState) {
-    if (gameState.flops >= 50) {
+    console.log(gameState.gpuCores)
+    if (gameState.flops >= cpuCost / 2) {
         toggleFade('flops');
     }
-    if (gameState.cpuCores >= 1) {
-        toggleFade('cpu-cores');
-    }
-    if (gameState.flops >= 100) {
+    if (gameState.flops >= cpuCost) {
         toggleFade('shop');
         toggleFade('buy-cpu-core', true, 'inline');
     }
+    if (gameState.flops >= gpuCost) {
+        toggleFade('buy-gpu-core', true, 'inline');
+    }
     if (gameState.cpuCores > 0) {
         toggleFade('cpu-typing-area');
+        toggleFade('cpu-cores');
+    }
+    if (gameState.gpuCores > 0) {
+        toggleFade('gpu-typing-area');
+        toggleFade('gpu-cores');
     }
 }
 

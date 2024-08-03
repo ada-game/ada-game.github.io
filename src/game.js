@@ -1,6 +1,6 @@
 
 import { gameState } from './state.js';
-import { cpuUpdateSpeed } from './constants.js';
+import { updateSpeed, cpuSpeed, gpuSpeed } from './constants.js';
 import { toggleFade } from './ui.js';
 
 export function initGame() {
@@ -22,13 +22,19 @@ export function buyCore(debug=false) {
     removeFocus();
 }
 
-export function cpuAutoType() {
+export function buyGpuCore(debug=false) {
+    gameState.buyGpuCore(debug);
+    removeFocus();
+}
+
+export function autoType() {
     let cpuCores = gameState.cpuCores;
-    if (cpuCores > 0) {
-        const autoTypeSpeed = Math.sqrt(cpuCores) * cpuUpdateSpeed / 1000;
-        gameState.cpuTypingEntity.type(autoTypeSpeed);
-        gameState.updateFlops(autoTypeSpeed);
-    }
+    let gpuCores = gameState.gpuCores;
+    let cpuTypeSpeed = cpuSpeed * Math.sqrt(cpuCores) * updateSpeed / 1000;
+    let gpuTypeSpeed = gpuSpeed * Math.sqrt(gpuCores) * updateSpeed / 1000;
+    gameState.cpuTypingEntity.type(cpuTypeSpeed);
+    gameState.gpuTypingEntity.type(gpuTypeSpeed);
+    gameState.updateFlops(cpuTypeSpeed + gpuTypeSpeed);
 }
 
 export function resetGame() {

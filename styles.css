@@ -66,12 +66,12 @@ body {
 @keyframes blink {
     50% { opacity: 0; }
 }
-#flops, #cpu-cores {
+#flops, #cpu-cores, #gpu-cores {
     display: none;
     font-size: 1.5em;
     margin: 20px 0;
 }
-#shop {
+#shop, #cpu-typing-area, #gpu-typing-area {
     display: none;
     margin-top: 20px;
 }
@@ -84,12 +84,6 @@ body {
     border-left: 1px solid #999;
     height: 100vh;
     overflow-y: auto;
-}
-#cpu-typing-area {
-    display: none;
-}
-#gpu-typing-area {
-    display: none;
 }
 .fade-element {
     display: none;

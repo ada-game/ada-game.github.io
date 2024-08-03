@@ -1,20 +1,28 @@
-import { playerOriginalText, cpuOriginalText } from './constants.js';
+import { playerOriginalText, cpuOriginalText, gpuOriginalText, cpuCost, gpuCost } from './constants.js';
 import { TypingEntity } from './typing.js';
 import { resetVisibility, updateVisibility } from './ui.js';
 
 class GameState {
-    constructor(playerTypingEntity, 
-                cpuTypingEntity,
-                flopsDisplay, 
-                cpuCoresDisplay, 
-                flops=0, 
-                cpuCores=0) {
+    constructor(
+        playerTypingEntity, 
+        cpuTypingEntity,
+        gpuTypingEntity,
+        flopsDisplay, 
+        cpuCoresDisplay, 
+        gpuCoresDisplay,
+        flops=0, 
+        cpuCores=0,
+        gpuCores=0
+    ) {
         this.playerTypingEntity = playerTypingEntity;
         this.cpuTypingEntity = cpuTypingEntity;
+        this.gpuTypingEntity = gpuTypingEntity;
         this.flopsDisplay = flopsDisplay;
         this.cpuCoresDisplay = cpuCoresDisplay;
+        this.gpuCoresDisplay = gpuCoresDisplay;
         this.flops = flops;
         this.cpuCores = cpuCores;
+        this.gpuCores = gpuCores;
     }
 
     updateFlops(amount=0) {
@@ -29,23 +37,42 @@ class GameState {
         updateVisibility(this);
     }
 
+    updateGpuCores(amount=0) {
+        this.gpuCores += amount;
+        this.gpuCoresDisplay.textContent = `GPU Cores: ${this.gpuCores}`;
+        updateVisibility(this);
+    }
+
     buyCore(debug=false) {
         if (debug===true) {
-            this.updateFlops(100);
+            this.updateFlops(cpuCost);
         }
-        if (this.flops >= 100) {
-            this.updateFlops(-100);
+        if (this.flops >= cpuCost) {
+            this.updateFlops(-cpuCost);
             this.updateCpuCores(1);
+        }
+    }
+
+    buyGpuCore(debug=false) {
+        if (debug===true) {
+            this.updateFlops(gpuCost);
+        }
+        if (this.flops >= gpuCost) {
+            this.updateFlops(-gpuCost);
+            this.updateGpuCores(1);
         }
     }
     
     reset() {
         this.flops = 0;
         this.cpuCores = 0;
+        this.gpuCores = 0;
         this.updateFlops();
         this.updateCpuCores();
+        this.updateGpuCores();
         this.playerTypingEntity.reset();
         this.cpuTypingEntity.reset();
+        this.gpuTypingEntity.reset();
         resetVisibility();
     }
 }
@@ -58,12 +85,19 @@ let cpuTypedText = document.querySelector('#cpu-typing-area .typed-text');
 let cpuUntypedText = document.querySelector('#cpu-typing-area .untyped-text');
 let cpuTypingEntity = new TypingEntity(cpuOriginalText, cpuTypedText, cpuUntypedText);
 
+let gpuTypedText = document.querySelector('#gpu-typing-area .typed-text');
+let gpuUntypedText = document.querySelector('#gpu-typing-area .untyped-text');
+let gpuTypingEntity = new TypingEntity(gpuOriginalText, gpuTypedText, gpuUntypedText);
+
 let flopsDisplay = document.getElementById('flops');
 let cpuCoresDisplay = document.getElementById('cpu-cores');
+let gpuCoresDisplay = document.getElementById('gpu-cores');
 
 export let gameState = new GameState(
     playerTypingEntity, 
     cpuTypingEntity, 
+    gpuTypingEntity,
     flopsDisplay, 
-    cpuCoresDisplay
+    cpuCoresDisplay,
+    gpuCoresDisplay
 );

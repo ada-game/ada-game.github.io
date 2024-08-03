@@ -1,8 +1,10 @@
-import { initGame, handleKeypress, buyCore, cpuAutoType, resetGame, addArbitraryFlops, addArbitraryCPUCores } from './game.js';
-import { cpuUpdateSpeed } from './constants.js';
+import { initGame, handleKeypress, buyCore, autoType, resetGame } from './game.js';
+import { addArbitraryFlops, addArbitraryCPUCores, buyGpuCore } from './game.js';
+import { updateSpeed } from './constants.js';
 import { saveGame, loadGame } from './storage.js';
 
-import { resetButton, buyCpuCoreButton, addOneCPUCoreButton, addCpuCoreButton, addCpuCoreField, addFlopsButton, addFlopsField } from './ui.js';
+import { resetButton, buyCpuCoreButton, buyGpuCoreButton } from './ui.js';
+import { addOneCPUCoreButton, addCpuCoreButton, addCpuCoreField, addFlopsButton, addFlopsField } from './ui.js';
 
 // Initial setup
 initGame();
@@ -11,6 +13,7 @@ initGame();
 // Event listeners
 document.addEventListener('keypress', handleKeypress);
 buyCpuCoreButton.addEventListener('click', buyCore);
+buyGpuCoreButton.addEventListener('click', buyGpuCore);
 
 // Dev mode event listeners
 resetButton.addEventListener('click', resetGame);
@@ -32,7 +35,7 @@ addFlopsButton.addEventListener('click', () => {
 });
 
 // Start CPU auto-typing
-setInterval(cpuAutoType, cpuUpdateSpeed);
+setInterval(autoType, updateSpeed);
 
 // Save game state every second
 // setInterval(saveGame, 1000);
