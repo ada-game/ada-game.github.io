@@ -36,7 +36,7 @@
             background-color: #000;
             animation: blink 0.7s infinite;
             position: absolute;
-            bottom: -0.15em; /* Offset cursor downwards */
+            bottom: 0.05em; /* Corrected positive offset */
         }
         @keyframes blink {
             50% { opacity: 0; }
@@ -73,21 +73,25 @@
         const text = "hello world";
         let typedIndex = 0;
         let score = 0;
-        const typingArea = document.getElementById('typing-area');
-        const scoreDisplay = document.getElementById('score');
+        let typingArea = document.getElementById('typing-area');
+        let scoreDisplay = document.getElementById('score');
         const resetButton = document.getElementById('reset-button');
         const devSidebar = document.getElementById('dev-sidebar');
 
-        // Initialize game
         function initGame() {
-            typingArea.innerHTML = '<span id="cursor"></span>' + text.split('').map(char => 
-                `<span class="untyped">${char}</span>`
-            ).join('');
+            typedIndex = 0;
+            score = 0;
             updateScore();
+            renderGame();
+        }
+
+        function renderGame() {
+            typingArea.innerHTML = '<span id="cursor"></span>' + text.split('').map((char, index) => 
+                `<span class="${index < typedIndex ? 'typed' : 'untyped'}">${char}</span>`
+            ).join('');
             positionCursor();
         }
 
-        // Position cursor
         function positionCursor() {
             const cursor = document.getElementById('cursor');
             if (typedIndex < text.length) {
@@ -98,39 +102,30 @@
             }
         }
 
-        // Update score
         function updateScore() {
             scoreDisplay.textContent = `Score: ${score}`;
             saveGame();
         }
 
-        // Handle keypress
-        document.addEventListener('keypress', (event) => {
+        function handleKeypress(event) {
             if (typedIndex < text.length && event.key === text[typedIndex]) {
-                typingArea.children[typedIndex + 1].className = 'typed';
                 typedIndex++;
                 score++;
                 updateScore();
-                positionCursor();
+                renderGame();
             }
-        });
-
-        // Reset game
-        function resetGame() {
-            typedIndex = 0;
-            score = 0;
-            initGame();
         }
 
-        resetButton.addEventListener('click', resetGame);
+        function resetGame() {
+            initGame();
+            saveGame();
+        }
 
-        // Save game state
         function saveGame() {
             localStorage.setItem('adaTypingScore', score.toString());
             localStorage.setItem('adaTypingIndex', typedIndex.toString());
         }
 
-        // Load game state
         function loadGame() {
             const savedScore = localStorage.getItem('adaTypingScore');
             const savedIndex = localStorage.getItem('adaTypingIndex');
@@ -138,20 +133,20 @@
                 score = parseInt(savedScore);
                 typedIndex = parseInt(savedIndex);
                 updateScore();
-                for (let i = 0; i < typedIndex; i++) {
-                    typingArea.children[i + 1].className = 'typed';
-                }
-                positionCursor();
+                renderGame();
             }
         }
 
-        // Toggle developer sidebar
-        const devMode = true; // Set this to false to hide the sidebar
+        const devMode = true;
         devSidebar.style.display = devMode ? 'block' : 'none';
 
-        // Initialize game
+        // Initial setup
         initGame();
         loadGame();
+
+        // Event listeners
+        document.addEventListener('keypress', handleKeypress);
+        resetButton.addEventListener('click', resetGame);
     </script>
 </body>
 </html>
