@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ada Clicker Game</title>
+    <title>Ada Typing Game</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -17,60 +17,121 @@
         #game-container {
             text-align: center;
         }
-        #click-button {
-            font-size: 1.5em;
-            padding: 10px 20px;
-            cursor: pointer;
-        }
-        #counter {
+        #typing-area {
             font-size: 2em;
             margin: 20px 0;
+            letter-spacing: 2px;
+        }
+        .untyped {
+            color: #ccc;
+        }
+        .typed {
+            color: #000;
+        }
+        #cursor {
+            display: inline-block;
+            width: 2px;
+            height: 1.2em;
+            background-color: #000;
+            animation: blink 0.7s infinite;
+        }
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+        #score {
+            font-size: 1.5em;
+            margin: 20px 0;
+        }
+        #dev-sidebar {
+            position: fixed;
+            right: 0;
+            top: 0;
+            background-color: #ddd;
+            padding: 10px;
+            border-left: 1px solid #999;
+            height: 100vh;
+            overflow-y: auto;
         }
     </style>
 </head>
 <body>
     <div id="game-container">
-        <h1>Ada Clicker</h1>
-        <div id="counter">0</div>
-        <button id="click-button">Click me!</button>
+        <h1>Ada Typing Game</h1>
+        <div id="typing-area"></div>
+        <div id="score">Score: 0</div>
+    </div>
+
+    <div id="dev-sidebar">
+        <h2>Developer Tools</h2>
+        <button id="reset-button">Reset Game</button>
     </div>
 
     <script>
-        let count = 0;
-        const counterDisplay = document.getElementById('counter');
-        const clickButton = document.getElementById('click-button');
+        const text = "hello world";
+        let typedIndex = 0;
+        let score = 0;
+        const typingArea = document.getElementById('typing-area');
+        const scoreDisplay = document.getElementById('score');
+        const resetButton = document.getElementById('reset-button');
+        const devSidebar = document.getElementById('dev-sidebar');
 
-        // Load saved state
+        // Initialize game
+        function initGame() {
+            typingArea.innerHTML = text.split('').map(char => 
+                `<span class="untyped">${char}</span>`
+            ).join('') + '<span id="cursor"></span>';
+            updateScore();
+        }
+
+        // Update score
+        function updateScore() {
+            scoreDisplay.textContent = `Score: ${score}`;
+            saveGame();
+        }
+
+        // Handle keypress
+        document.addEventListener('keypress', (event) => {
+            if (typedIndex < text.length && event.key === text[typedIndex]) {
+                typingArea.children[typedIndex].className = 'typed';
+                typedIndex++;
+                score++;
+                updateScore();
+                if (typedIndex < text.length) {
+                    typingArea.children[typedIndex].insertAdjacentElement('beforebegin', typingArea.lastElementChild);
+                }
+            }
+        });
+
+        // Reset game
+        function resetGame() {
+            typedIndex = 0;
+            score = 0;
+            initGame();
+        }
+
+        resetButton.addEventListener('click', resetGame);
+
+        // Save game state
+        function saveGame() {
+            localStorage.setItem('adaTypingScore', score.toString());
+        }
+
+        // Load game state
         function loadGame() {
-            const savedCount = localStorage.getItem('adaClickerCount');
-            if (savedCount !== null) {
-                count = parseInt(savedCount);
-                updateDisplay();
+            const savedScore = localStorage.getItem('adaTypingScore');
+            if (savedScore !== null) {
+                score = parseInt(savedScore);
+                updateScore();
             }
         }
 
-        // Save state
-        function saveGame() {
-            localStorage.setItem('adaClickerCount', count.toString());
-        }
-
-        // Update display
-        function updateDisplay() {
-            counterDisplay.textContent = count;
-        }
-
-        // Click handler
-        clickButton.addEventListener('click', () => {
-            count++;
-            updateDisplay();
-            saveGame();
-        });
+        // Toggle developer sidebar
+        const devMode = true; // Set this to false to hide the sidebar
+        devSidebar.style.display = devMode ? 'block' : 'none';
 
         // Initialize game
+        initGame();
         loadGame();
-
-        // Auto-save every 10 seconds
-        setInterval(saveGame, 10000);
     </script>
 </body>
 </html>
