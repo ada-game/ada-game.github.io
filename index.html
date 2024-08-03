@@ -21,6 +21,7 @@
             font-size: 2em;
             margin: 20px 0;
             letter-spacing: 2px;
+            position: relative;
         }
         .untyped {
             color: #ccc;
@@ -34,6 +35,8 @@
             height: 1.2em;
             background-color: #000;
             animation: blink 0.7s infinite;
+            position: absolute;
+            bottom: -0.15em; /* Offset cursor downwards */
         }
         @keyframes blink {
             50% { opacity: 0; }
@@ -77,10 +80,22 @@
 
         // Initialize game
         function initGame() {
-            typingArea.innerHTML = text.split('').map(char => 
+            typingArea.innerHTML = '<span id="cursor"></span>' + text.split('').map(char => 
                 `<span class="untyped">${char}</span>`
-            ).join('') + '<span id="cursor"></span>';
+            ).join('');
             updateScore();
+            positionCursor();
+        }
+
+        // Position cursor
+        function positionCursor() {
+            const cursor = document.getElementById('cursor');
+            if (typedIndex < text.length) {
+                const nextChar = typingArea.children[typedIndex + 1];
+                cursor.style.left = `${nextChar.offsetLeft}px`;
+            } else {
+                cursor.style.left = `${typingArea.lastElementChild.offsetLeft + typingArea.lastElementChild.offsetWidth}px`;
+            }
         }
 
         // Update score
@@ -92,13 +107,11 @@
         // Handle keypress
         document.addEventListener('keypress', (event) => {
             if (typedIndex < text.length && event.key === text[typedIndex]) {
-                typingArea.children[typedIndex].className = 'typed';
+                typingArea.children[typedIndex + 1].className = 'typed';
                 typedIndex++;
                 score++;
                 updateScore();
-                if (typedIndex < text.length) {
-                    typingArea.children[typedIndex].insertAdjacentElement('beforebegin', typingArea.lastElementChild);
-                }
+                positionCursor();
             }
         });
 
@@ -114,14 +127,21 @@
         // Save game state
         function saveGame() {
             localStorage.setItem('adaTypingScore', score.toString());
+            localStorage.setItem('adaTypingIndex', typedIndex.toString());
         }
 
         // Load game state
         function loadGame() {
             const savedScore = localStorage.getItem('adaTypingScore');
-            if (savedScore !== null) {
+            const savedIndex = localStorage.getItem('adaTypingIndex');
+            if (savedScore !== null && savedIndex !== null) {
                 score = parseInt(savedScore);
+                typedIndex = parseInt(savedIndex);
                 updateScore();
+                for (let i = 0; i < typedIndex; i++) {
+                    typingArea.children[i + 1].className = 'typed';
+                }
+                positionCursor();
             }
         }
 
